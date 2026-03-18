@@ -21,6 +21,7 @@ export default function ScheduleGenerator() {
   const [familyId, setFamilyId] = useState(familiesData.families[0].id)
   const [maxLegHours, setMaxLegHours] = useState(3)
   const [totalLegs, setTotalLegs] = useState(4)
+  const [excludeInput, setExcludeInput] = useState('')
 
   const [draft, setDraft] = useState<GeneratedSchedule | null>(null)
   const [savedId, setSavedId] = useState<string | null>(null)
@@ -34,11 +35,16 @@ export default function ScheduleGenerator() {
     setDraft(null)
     setSavedId(null)
 
+    const excludeAirports = excludeInput
+      .split(',')
+      .map((s) => s.trim().toUpperCase())
+      .filter((s) => /^[A-Z]{4}$/.test(s))
+
     try {
       const res = await fetch('/api/schedules/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ airlineIcao, familyId, maxLegHours, totalLegs }),
+        body: JSON.stringify({ airlineIcao, familyId, maxLegHours, totalLegs, excludeAirports }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -147,6 +153,17 @@ export default function ScheduleGenerator() {
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="mb-5">
+          <label className={labelClass}>Exclude Airports</label>
+          <input
+            type="text"
+            value={excludeInput}
+            onChange={(e) => setExcludeInput(e.target.value)}
+            placeholder="e.g. KORD, KJFK"
+            className={inputClass}
+          />
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">

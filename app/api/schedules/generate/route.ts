@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { airlineIcao, familyId, maxLegHours, totalLegs } = body as Record<string, unknown>
+  const { airlineIcao, familyId, maxLegHours, totalLegs, excludeAirports } = body as Record<string, unknown>
 
   if (
     typeof airlineIcao !== 'string' ||
@@ -24,8 +24,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing or invalid fields' }, { status: 400 })
   }
 
+  const parsedExclude =
+    Array.isArray(excludeAirports)
+      ? excludeAirports.filter((v): v is string => typeof v === 'string')
+      : []
+
   try {
-    const result = await generateSchedule({ airlineIcao, familyId, maxLegHours, totalLegs })
+    const result = await generateSchedule({ airlineIcao, familyId, maxLegHours, totalLegs, excludeAirports: parsedExclude })
     return NextResponse.json({ result })
   } catch (err) {
     if (err instanceof ScheduleGeneratorError) {

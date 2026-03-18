@@ -9,6 +9,7 @@ export interface GenerateScheduleInput {
   familyId: string
   maxLegHours: number
   totalLegs: number
+  excludeAirports?: string[]
 }
 
 export interface GeneratedFlight {
@@ -74,12 +75,17 @@ async function queryRoutes(params: {
   destinationIcao?: string
   aircraftIn?: string[]
   maxDuration?: number
+  excludeDestinations?: string[]
 }) {
+  const destFilter: Record<string, unknown> = {}
+  if (params.destinationIcao) destFilter.equals = params.destinationIcao
+  if (params.excludeDestinations?.length) destFilter.notIn = params.excludeDestinations
+
   return prisma.route.findMany({
     where: {
       airlineIcao: params.airlineIcao,
       ...(params.originIcao && { originIcao: params.originIcao }),
-      ...(params.destinationIcao && { destinationIcao: params.destinationIcao }),
+      ...(Object.keys(destFilter).length > 0 && { destinationIcao: destFilter }),
       ...(params.aircraftIn && { aircraftIcao: { in: params.aircraftIn } }),
       ...(params.maxDuration && { durationMinutes: { lte: params.maxDuration } }),
     },
@@ -105,7 +111,8 @@ async function generateOutAndBack(
   familyCodes: string[],
   maxDurationMinutes: number,
   baseIcao: string,
-  totalLegs: number
+  totalLegs: number,
+  excludeAirports: string[]
 ): Promise<GeneratedFlight[]> {
   const numberOfPairs = totalLegs / 2
 
@@ -114,6 +121,7 @@ async function generateOutAndBack(
     originIcao: baseIcao,
     aircraftIn: familyCodes,
     maxDuration: maxDurationMinutes,
+    excludeDestinations: excludeAirports,
   })
 
   if (outboundCandidates.length === 0) {
@@ -153,6 +161,7 @@ async function generateOutAndBack(
       originIcao: outbound.destinationIcao,
       destinationIcao: baseIcao,
       aircraftIn: familyCodes,
+      excludeDestinations: excludeAirports,
     })
 
     if (returnCandidates.length > 0) {
@@ -195,10 +204,12 @@ async function generateChain(
   maxDurationMinutes: number,
   baseIcao: string,
   hubSet: Set<string>,
-  totalLegs: number
+  totalLegs: number,
+  excludeAirports: string[]
 ): Promise<GeneratedFlight[]> {
   const flights: GeneratedFlight[] = []
   let currentAirport = baseIcao
+  const eligibleHubs = Array.from(hubSet).filter((h) => !excludeAirports.includes(h))
 
   for (let leg = 1; leg <= totalLegs; leg++) {
     const candidates = await queryRoutes({
@@ -206,6 +217,7 @@ async function generateChain(
       originIcao: currentAirport,
       aircraftIn: familyCodes,
       maxDuration: maxDurationMinutes,
+      excludeDestinations: excludeAirports,
     })
 
     if (candidates.length > 0) {
@@ -224,7 +236,7 @@ async function generateChain(
       currentAirport = selected.destinationIcao
     } else {
       // Stuck at an outstation — generate fictional leg back into the network
-      const targetHub = randomChoice(Array.from(hubSet))
+      const targetHub = randomChoice(eligibleHubs)
       const flightNumber =
         flights.length > 0
           ? generateReturnFlightNumber(flights[flights.length - 1].flightNumber)
@@ -270,6 +282,7 @@ export async function generateSchedule(
 
   const hubSet = new Set(airlineConfig.hubs)
   const isSingleHub = hubSet.size === 1
+  const excludeAirports = input.excludeAirports ?? []
 
   if (isSingleHub && input.totalLegs % 2 !== 0) {
     throw new ScheduleGeneratorError('Single-hub airlines require an even number of legs')
@@ -285,7 +298,15 @@ export async function generateSchedule(
   const familyCodes = familyConfig.icao_codes
   const maxDurationMinutes = input.maxLegHours * 60
   const mode: 'out-and-back' | 'chain' = isSingleHub ? 'out-and-back' : 'chain'
-  const baseIcao = isSingleHub ? airlineConfig.hubs[0] : randomChoice(airlineConfig.hubs)
+
+  // For chain mode, pick a starting hub that isn't excluded
+  const eligibleHubs = airlineConfig.hubs.filter((h) => !excludeAirports.includes(h))
+  if (!isSingleHub && eligibleHubs.length === 0) {
+    throw new ScheduleGeneratorError(
+      'Not enough matching routes for these filters. Try a different airline, aircraft family, or increase the maximum leg duration.'
+    )
+  }
+  const baseIcao = isSingleHub ? airlineConfig.hubs[0] : randomChoice(eligibleHubs)
 
   const flights =
     mode === 'out-and-back'
@@ -294,7 +315,8 @@ export async function generateSchedule(
           familyCodes,
           maxDurationMinutes,
           baseIcao,
-          input.totalLegs
+          input.totalLegs,
+          excludeAirports
         )
       : await generateChain(
           input.airlineIcao,
@@ -302,7 +324,8 @@ export async function generateSchedule(
           maxDurationMinutes,
           baseIcao,
           hubSet,
-          input.totalLegs
+          input.totalLegs,
+          excludeAirports
         )
 
   return {
