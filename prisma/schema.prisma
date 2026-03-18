@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(cuid())
+  email          String     @unique
+  hashedPassword String
+  name           String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  schedules      Schedule[]
+}
+
+model Route {
+  id              String   @id @default(cuid())
+  airlineIcao     String
+  flightNumber    String
+  originIcao      String
+  destinationIcao String
+  aircraftIcao    String
+  durationMinutes Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([airlineIcao, originIcao, aircraftIcao])
+  @@index([airlineIcao, destinationIcao, aircraftIcao])
+  @@index([airlineIcao, originIcao, destinationIcao])
+}
+
+model Schedule {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  airline   String
+  family    String
+  baseIcao  String
+  mode      String           @default("chain")
+  maxLegH   Int
+  legs      Int
+  createdAt DateTime         @default(now())
+  flights   ScheduleFlight[]
+}
+
+model ScheduleFlight {
+  id              String   @id @default(cuid())
+  scheduleId      String
+  schedule        Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  sequence        Int
+  pairIndex       Int
+  direction       String
+  flightNumber    String
+  originIcao      String
+  destinationIcao String
+  aircraftIcao    String
+  durationMinutes Int
+  isGenerated     Boolean  @default(false)
+
+  @@index([scheduleId])
+}

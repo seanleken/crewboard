@@ -1,0 +1,19 @@
+{
+  "families": [
+    {
+      "id": "a320",
+      "name": "A320 Family",
+      "icao_codes": ["A318", "A319", "A320", "A321", "A20N", "A21N"]
+    },
+    {
+      "id": "a330",
+      "name": "A330 Family",
+      "icao_codes": ["A332", "A333", "A338", "A339"]
+    },
+    {
+      "id": "b777",
+      "name": "777 Family",
+      "icao_codes": ["B77L", "B772", "B773", "B77W"]
+    }
+  ]
+}

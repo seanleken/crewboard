@@ -1,0 +1,57 @@
+{
+  "airlines": [
+    {
+      "icao": "DLH",
+      "name": "Lufthansa",
+      "hubs": ["EDDF", "EDDM"]
+    },
+    {
+      "icao": "AFR",
+      "name": "Air France",
+      "hubs": ["LFPG"]
+    },
+    {
+      "icao": "BEL",
+      "name": "Brussels Airlines",
+      "hubs": ["EBBR"]
+    },
+    {
+      "icao": "BAW",
+      "name": "British Airways",
+      "hubs": ["EGLL"]
+    },
+    {
+      "icao": "AAL",
+      "name": "American Airlines",
+      "hubs": ["KJFK", "KLAX", "KPHL", "KDFW", "KMIA", "KCLT", "KDCA"]
+    },
+    {
+      "icao": "UAL",
+      "name": "United Airlines",
+      "hubs": ["KEWR", "KORD", "KDEN", "KIAH", "KSFO", "KLAX", "KIAD"]
+    },
+    {
+      "icao": "DAL",
+      "name": "Delta Air Lines",
+      "hubs": ["KJFK", "KSLC", "KMSP", "KDTW", "KBOS", "KATL", "KLAX", "KSEA"]
+    },
+    {
+      "icao": "FFT",
+      "name": "Frontier Airlines",
+      "hubs": ["KATL", "KORD", "KCVG", "KCLE", "KDFW", "KLAS", "KMIA", "KMCO", "KPHX", "KDEN"]
+    },
+    {
+      "icao": "EZY",
+      "name": "easyJet",
+      "hubs": ["EGKK", "EGGW", "EGMC", "EGSS", "EGGD", "EGCC", "EGGP", "EGBB",
+  "EGPH", "EGPF", "EGAA", "EGNT", "LFPG", "LFPO", "LFLL", "LFMN",
+  "LFBD", "LFRS", "LIMC", "LIML", "LIRN", "LIRF", "LSGG", "LFSB",
+  "EHAM", "EDDB", "LEBL", "LPPT", "LPPR"]
+    },
+    {
+      "icao": "RYR",
+      "name": "Ryanair",
+      "hubs": ["EGCC", "EPKK", "LIRF", "LIPZ"]
+    }
+  ]
+}
