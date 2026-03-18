@@ -34,13 +34,17 @@ export async function registerAction(
   if (!email || !password) return 'Email and password are required'
   if (password.length < 8) return 'Password must be at least 8 characters'
 
-  const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) return 'An account with this email already exists'
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) return 'An account with this email already exists'
 
-  const hashedPassword = await bcrypt.hash(password, 12)
-  await prisma.user.create({
-    data: { email, hashedPassword, name: name || null },
-  })
+    const hashedPassword = await bcrypt.hash(password, 12)
+    await prisma.user.create({
+      data: { email, hashedPassword, name: name || null },
+    })
+  } catch {
+    return 'Could not create account. Please try again.'
+  }
 
   try {
     await signIn('credentials', { email, password, redirectTo: '/dashboard' })

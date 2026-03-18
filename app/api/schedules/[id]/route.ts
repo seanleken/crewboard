@@ -10,16 +10,21 @@ export async function GET(
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const schedule = await prisma.schedule.findUnique({
-    where: { id },
-    include: { flights: { orderBy: { sequence: 'asc' } } },
-  })
 
-  if (!schedule || schedule.userId !== session.user.id) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  try {
+    const schedule = await prisma.schedule.findUnique({
+      where: { id },
+      include: { flights: { orderBy: { sequence: 'asc' } } },
+    })
+
+    if (!schedule || schedule.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ schedule })
+  } catch {
+    return NextResponse.json({ error: 'Failed to load schedule' }, { status: 500 })
   }
-
-  return NextResponse.json({ schedule })
 }
 
 export async function DELETE(
@@ -30,12 +35,17 @@ export async function DELETE(
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const schedule = await prisma.schedule.findUnique({ where: { id } })
 
-  if (!schedule || schedule.userId !== session.user.id) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  try {
+    const schedule = await prisma.schedule.findUnique({ where: { id } })
+
+    if (!schedule || schedule.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
+    await prisma.schedule.delete({ where: { id } })
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json({ error: 'Failed to delete schedule' }, { status: 500 })
   }
-
-  await prisma.schedule.delete({ where: { id } })
-  return NextResponse.json({ success: true })
 }

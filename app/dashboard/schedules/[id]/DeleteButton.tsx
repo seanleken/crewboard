@@ -8,13 +8,23 @@ export default function DeleteButton({ scheduleId }: { scheduleId: string }) {
   const router = useRouter()
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState(false)
 
   async function handleDelete() {
     setDeleting(true)
+    setError(false)
     try {
-      await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' })
+      const res = await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        setError(true)
+        setConfirming(false)
+        return
+      }
       router.push('/dashboard/schedules')
       router.refresh()
+    } catch {
+      setError(true)
+      setConfirming(false)
     } finally {
       setDeleting(false)
     }
@@ -43,12 +53,17 @@ export default function DeleteButton({ scheduleId }: { scheduleId: string }) {
   }
 
   return (
-    <button
-      onClick={() => setConfirming(true)}
-      className="bg-transparent hover:bg-red-900/20 text-red-400 hover:text-red-300 font-medium border border-red-400/20 hover:border-red-400/30 px-4 py-2.5 rounded-md transition-colors flex items-center gap-2"
-    >
-      <Trash2 size={15} strokeWidth={1.5} />
-      Delete
-    </button>
+    <div className="flex items-center gap-3">
+      {error && (
+        <span className="text-sm text-red-400">Failed to delete — try again</span>
+      )}
+      <button
+        onClick={() => setConfirming(true)}
+        className="bg-transparent hover:bg-red-900/20 text-red-400 hover:text-red-300 font-medium border border-red-400/20 hover:border-red-400/30 px-4 py-2.5 rounded-md transition-colors flex items-center gap-2"
+      >
+        <Trash2 size={15} strokeWidth={1.5} />
+        Delete
+      </button>
+    </div>
   )
 }
