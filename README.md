@@ -30,7 +30,7 @@ Realistic flight schedule generator for flight simulator pilots. Pick an airline
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - A [Neon](https://neon.tech) PostgreSQL database (free tier is sufficient)
 - A [FlightAware AeroAPI](https://www.flightaware.com/commercial/aeroapi/) key for seeding (personal tier, free, 500 calls/month)
 
