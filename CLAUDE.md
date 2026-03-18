@@ -27,17 +27,27 @@ npx prisma generate   # regenerate client after schema changes (also runs on db 
 
 ```
 app/
-  page.tsx                          # Landing page (public)
+  page.tsx                          # Landing page (public, auth-aware CTAs)
+  error.tsx                         # Global error boundary
+  not-found.tsx                     # Custom 404 page
   login/page.tsx                    # Login form
   register/page.tsx                 # Register form
   actions/auth.ts                   # Server actions: loginAction, registerAction, signOutAction
   dashboard/
-    page.tsx                        # Server component — fetches schedules, renders layout
+    layout.tsx                      # Shared sidebar layout for all authenticated pages
+    error.tsx                       # Dashboard-scoped error boundary
+    page.tsx                        # Schedule generator only (no past schedules list)
     ScheduleGenerator.tsx           # Client — form, draft/save state
-    PastSchedulesList.tsx           # Client — list with inline delete confirmation
-    schedules/[id]/
-      page.tsx                      # Server — schedule detail view
-      DeleteButton.tsx              # Client — inline delete confirmation
+    schedules/
+      page.tsx                      # Saved schedules list (dedicated page)
+      [id]/
+        page.tsx                    # Schedule detail view
+        DeleteButton.tsx            # Client — inline delete confirmation
+    flights/
+      [flightId]/
+        page.tsx                    # Flight detail — SimBrief dispatch + METAR + route map
+    settings/
+      page.tsx                      # Settings placeholder (email display)
   api/
     auth/[...nextauth]/route.ts
     schedules/
@@ -46,15 +56,21 @@ app/
       [id]/route.ts                 # GET single, DELETE
 
 components/
-  ScheduleTable.tsx                 # Shared flight table (dashboard + detail page)
+  Sidebar.tsx                       # Fixed sidebar nav (desktop) + slide-over (mobile)
+  ScheduleTable.tsx                 # Client component — shared flight table, clickable rows
+  RouteMap.tsx                      # Client component — Mapbox GL dark route map
 
 lib/
   prisma.ts                         # Prisma singleton
   schedule-generator.ts             # Core algorithm
+  metar.ts                          # AviationWeather.gov fetch with 30-min revalidation cache
+  simbrief.ts                       # SimBrief dispatch URL builder
+  airports.ts                       # Airport coordinate lookup (from config/airports.json)
 
 config/
   airlines.json                     # Airline ICAO codes, names, hub airports
   aircraft-families.json            # Aircraft family IDs and ICAO type codes
+  airports.json                     # ~28k airport coordinates (mwgg/Airports dataset)
 
 scripts/
   seed.ts                           # AeroAPI seeder (tsx --env-file=.env scripts/seed.ts)
@@ -70,7 +86,7 @@ Generate and save are **two separate steps** by design:
 - `POST /api/schedules/generate` — runs the algorithm, returns the result, **no DB write**
 - `POST /api/schedules` — persists the draft to the database
 
-The `ScheduleGenerator` component holds the draft in local state. After a successful save it calls `router.refresh()` which triggers the server component (`dashboard/page.tsx`) to re-fetch the past schedules list.
+The `ScheduleGenerator` component holds the draft in local state. After a successful save it calls `router.refresh()`. Past schedules live at `/dashboard/schedules`, not on the dashboard page.
 
 ### Schedule Generation — Two Modes
 Detected automatically from hub count in `config/airlines.json`:
@@ -81,6 +97,17 @@ Detected automatically from hub count in `config/airlines.json`:
 | 2+ | `chain` | Sequential — each leg departs from where the previous landed. No pairing or aircraft consistency constraint. Odd/even legs both valid. |
 
 When stuck at an outstation with no routes in the DB, the algorithm generates a **fictional leg** to a random hub and marks it `isGenerated: true`. This is displayed with an `est.` badge in the table.
+
+### Sidebar Layout
+All authenticated pages share `app/dashboard/layout.tsx` which renders `components/Sidebar.tsx`. The sidebar is fixed-width (220px) on desktop. On mobile it collapses to a top bar with a hamburger slide-over. The layout handles the auth check — individual pages do not need their own redirect.
+
+### Flight Detail Page
+`/dashboard/flights/[flightId]` shows a single `ScheduleFlight` with:
+- **SimBrief dispatch** — URL built in `lib/simbrief.ts`, opens in new tab pre-filled
+- **METAR weather** — fetched server-side via `lib/metar.ts` using AviationWeather.gov, streamed via React Suspense, 30-min revalidation cache
+- **Route map** — Mapbox GL `dark-v11` in `components/RouteMap.tsx`, great-circle arc computed manually, amber/green markers
+
+`ScheduleTable` rows are clickable links to flight detail for saved schedules (flights with an `id`). Draft rows are not clickable.
 
 ### Seeding Strategy
 Routes are fetched from **FlightAware AeroAPI** and cached in Postgres — no live API calls at runtime.
@@ -103,13 +130,43 @@ Route protection is in `proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy
 
 ## Design System
 
-Brand colour scale is `brand-{50..900}` (defined in `tailwind.config.ts`). Key patterns:
-- Cards: `bg-white border border-gray-200 rounded-lg shadow-sm p-6`
-- Primary button: `bg-brand-500 hover:bg-brand-600 text-white font-semibold px-4 py-2.5 rounded-md`
-- Secondary button: `bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-4 py-2.5 rounded-md`
-- Inputs: `border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 px-3 py-2.5 rounded-md`
+The app is **dark-themed only** — no light mode. Font is **Plus Jakarta Sans** (via `next/font/google`).
+
+### Colour tokens (defined in `tailwind.config.ts`)
+
+**Backgrounds** (darkest → lightest):
+- `bg-dark-sidebar` — sidebar (`#0C0F14`)
+- `bg-dark-primary` — page background (`#111318`)
+- `bg-dark-card` — cards and panels (`#1A1D24`)
+- `bg-dark-elevated` — hover states, inputs, active items (`#22262E`)
+- `bg-dark-border` / `border-dark-border` — borders (`#2A2E37`)
+
+**Text**:
+- `text-[#F1F2F4]` — primary text (headings, values)
+- `text-gray-400` — secondary text (labels, metadata)
+- `text-gray-500` — tertiary text (placeholders, disabled)
+
+**Accent (amber)**:
+- `accent-400` (`#FFC107`) — primary interactive colour (buttons, links, active nav)
+- `accent-500` (`#FFB300`) — hover
+- `accent-600` (`#FFA000`) — active/pressed
+
+**Semantic**:
+- `text-blue-400` / `bg-blue-400/10` — hub airport badges, out-and-back mode badge
+- `text-green-400` — saved indicator, arrival marker on route map
+- `text-red-400` — destructive actions
+- `text-amber-300` / `bg-amber-900/20` — `est.` badge for generated flights, error banners
+
+### Key patterns
+
+- Cards: `bg-dark-card border border-dark-border rounded-lg p-6`
+- Primary button: `bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2.5 rounded-md`
+- Secondary button: `bg-dark-elevated hover:bg-dark-border text-gray-400 hover:text-[#F1F2F4] border border-dark-border px-4 py-2.5 rounded-md`
+- Destructive button: `bg-transparent hover:bg-red-900/20 text-red-400 border border-red-400/20 px-4 py-2.5 rounded-md`
+- Inputs: `bg-dark-elevated border border-dark-border focus:border-accent-400 focus:ring-2 focus:ring-accent-400/20 text-[#F1F2F4] px-3 py-2.5 rounded-md`
 - ICAO codes and flight numbers: always `font-mono`
 - Duration format: `1h 05m` (not "65 minutes")
+- No shadows — elevation is communicated through background colour difference
 
 No component libraries (no shadcn, Radix, Headless UI). No form libraries. Hand-built components only.
 
