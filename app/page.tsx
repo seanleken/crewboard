@@ -1,5 +1,6 @@
 import { Plane, SlidersHorizontal, Route } from 'lucide-react'
 import Link from 'next/link'
+import { auth } from '@/auth'
 
 const airlines = [
   { icao: 'DLH', name: 'Lufthansa' },
@@ -14,7 +15,9 @@ const airlines = [
   { icao: 'RYR', name: 'Ryanair' },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth()
+
   return (
     <div className="min-h-screen bg-dark-primary">
       {/* Top nav */}
@@ -24,18 +27,29 @@ export default function Home() {
           <span className="font-bold text-lg text-[#F1F2F4]">CrewBoard</span>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="border border-dark-border text-gray-400 hover:text-[#F1F2F4] hover:bg-dark-elevated font-medium px-4 py-2 rounded-md text-sm transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/register"
-            className="bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2 rounded-md text-sm transition-colors"
-          >
-            Register
-          </Link>
+          {session ? (
+            <Link
+              href="/dashboard"
+              className="bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2 rounded-md text-sm transition-colors"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="border border-dark-border text-gray-400 hover:text-[#F1F2F4] hover:bg-dark-elevated font-medium px-4 py-2 rounded-md text-sm transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2 rounded-md text-sm transition-colors"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -55,18 +69,29 @@ export default function Home() {
             Pick an airline, choose an aircraft family, and get an operationally consistent schedule built from real-world route data.
           </p>
           <div className="flex justify-center gap-3 relative">
-            <Link
-              href="/register"
-              className="bg-accent-400 hover:bg-accent-500 active:bg-accent-600 text-dark-primary font-semibold px-5 py-2.5 rounded-md transition-colors"
-            >
-              Get started
-            </Link>
-            <Link
-              href="/login"
-              className="border border-dark-border text-gray-400 hover:text-[#F1F2F4] hover:bg-dark-elevated font-medium px-5 py-2.5 rounded-md transition-colors"
-            >
-              Log in
-            </Link>
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="bg-accent-400 hover:bg-accent-500 active:bg-accent-600 text-dark-primary font-semibold px-5 py-2.5 rounded-md transition-colors"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/register"
+                  className="bg-accent-400 hover:bg-accent-500 active:bg-accent-600 text-dark-primary font-semibold px-5 py-2.5 rounded-md transition-colors"
+                >
+                  Get started
+                </Link>
+                <Link
+                  href="/login"
+                  className="border border-dark-border text-gray-400 hover:text-[#F1F2F4] hover:bg-dark-elevated font-medium px-5 py-2.5 rounded-md transition-colors"
+                >
+                  Log in
+                </Link>
+              </>
+            )}
           </div>
         </section>
 

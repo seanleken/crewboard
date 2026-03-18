@@ -5,3 +5,16 @@
 body {
   @apply bg-dark-primary text-[#F1F2F4] antialiased;
 }
+
+/* Mapbox popup dark theme */
+.mapboxgl-popup-content {
+  background: #1A1D24;
+  border: 1px solid #2A2E37;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.mapboxgl-popup-tip {
+  border-top-color: #1A1D24 !important;
+  border-bottom-color: #1A1D24 !important;
+}

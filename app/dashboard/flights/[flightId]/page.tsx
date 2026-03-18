@@ -6,6 +6,8 @@ import { ArrowLeft, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { buildSimBriefUrl } from '@/lib/simbrief'
 import { fetchMetar, formatObservationTime } from '@/lib/metar'
+import { getAirport } from '@/lib/airports'
+import RouteMap from '@/components/RouteMap'
 import airlinesConfig from '@/config/airlines.json'
 
 function formatDuration(minutes: number): string {
@@ -101,6 +103,8 @@ export default async function FlightDetailPage({
   const airlineName = getAirlineName(schedule.airline)
   const simBriefUrl = buildSimBriefUrl(flight, schedule.airline)
   const hubs = new Set(getHubs(schedule.airline))
+  const originAirport = getAirport(flight.originIcao)
+  const destAirport = getAirport(flight.destinationIcao)
 
   return (
     <div className="space-y-6">
@@ -177,6 +181,14 @@ export default async function FlightDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Route map */}
+      {originAirport && destAirport && (
+        <RouteMap
+          origin={{ icao: flight.originIcao, name: originAirport.name, lat: originAirport.lat, lon: originAirport.lon }}
+          destination={{ icao: flight.destinationIcao, name: destAirport.name, lat: destAirport.lat, lon: destAirport.lon }}
+        />
+      )}
 
       {/* METAR cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

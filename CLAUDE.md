@@ -116,8 +116,9 @@ No component libraries (no shadcn, Radix, Headless UI). No form libraries. Hand-
 ## Environment Variables
 
 ```
-DATABASE_URL        Neon PostgreSQL connection string (required)
-AUTH_SECRET         Random secret for NextAuth JWT signing (required)
-AUTH_URL            App base URL, e.g. http://localhost:3000 (required)
-AEROAPI_KEY         FlightAware AeroAPI key (only needed for seeding)
+DATABASE_URL                Neon PostgreSQL connection string (required)
+AUTH_SECRET                 Random secret for NextAuth JWT signing (required)
+AUTH_URL                    App base URL, e.g. http://localhost:3000 (required)
+AEROAPI_KEY                 FlightAware AeroAPI key (only needed for seeding)
+NEXT_PUBLIC_MAPBOX_TOKEN    Mapbox public token for route map on flight detail page
 ```
