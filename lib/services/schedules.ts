@@ -3,10 +3,11 @@ import type { GeneratedSchedule } from '@/lib/schedule-generator'
 
 // --- Schedules ---
 
-export function listSchedules(userId: string) {
+export function listSchedules(userId: string, limit?: number) {
   return prisma.schedule.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
+    ...(limit !== undefined && { take: limit }),
     select: {
       id: true,
       airline: true,
