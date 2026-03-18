@@ -12,8 +12,8 @@ const LEG_OPTIONS = [2, 4, 6, 8]
 const MAX_LEG_HOUR_OPTIONS = Array.from({ length: 18 }, (_, i) => i + 1)
 
 const inputClass =
-  'w-full bg-white border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-gray-900 px-3 py-2.5 rounded-md text-base transition-colors duration-150 outline-none'
-const labelClass = 'block text-sm font-medium text-gray-700 mb-1.5'
+  'w-full bg-dark-elevated border border-dark-border focus:border-accent-400 focus:ring-2 focus:ring-accent-400/20 text-[#F1F2F4] px-3 py-2.5 rounded-md text-base transition-colors outline-none'
+const labelClass = 'block text-sm font-medium text-gray-400 mb-1.5'
 
 export default function ScheduleGenerator() {
   const router = useRouter()
@@ -84,8 +84,8 @@ export default function ScheduleGenerator() {
   return (
     <div className="space-y-6">
       {/* Generator form */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-5">Generate Schedule</h2>
+      <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-[#F1F2F4] mb-5">Generate Schedule</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <div>
@@ -153,7 +153,7 @@ export default function ScheduleGenerator() {
           <button
             onClick={generate}
             disabled={isLoading}
-            className="bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-semibold px-4 py-2.5 rounded-md transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="bg-accent-400 hover:bg-accent-500 active:bg-accent-600 text-dark-primary font-semibold px-4 py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {generating ? (
               <>
@@ -169,7 +169,7 @@ export default function ScheduleGenerator() {
             <button
               onClick={generate}
               disabled={isLoading}
-              className="bg-white hover:bg-gray-50 text-gray-700 font-medium border border-gray-300 px-4 py-2.5 rounded-md transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-dark-elevated hover:bg-dark-border text-gray-400 hover:text-[#F1F2F4] font-medium border border-dark-border px-4 py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <RefreshCw size={15} />
               Regenerate
@@ -180,7 +180,7 @@ export default function ScheduleGenerator() {
             <button
               onClick={save}
               disabled={isLoading}
-              className="bg-white hover:bg-gray-50 text-gray-700 font-medium border border-gray-300 px-4 py-2.5 rounded-md transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-dark-elevated hover:bg-dark-border text-gray-400 hover:text-[#F1F2F4] font-medium border border-dark-border px-4 py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {saving ? (
                 <>
@@ -197,7 +197,7 @@ export default function ScheduleGenerator() {
           )}
 
           {isSaved && (
-            <span className="flex items-center gap-1.5 text-sm text-green-600">
+            <span className="flex items-center gap-1.5 text-sm text-green-400">
               <CheckCircle size={15} />
               Saved
             </span>
@@ -207,20 +207,20 @@ export default function ScheduleGenerator() {
 
       {/* Error */}
       {error && !isLoading && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertTriangle size={16} className="text-yellow-600 mt-0.5 shrink-0" strokeWidth={1.5} />
-          <p className="text-sm text-yellow-800">{error}</p>
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" strokeWidth={1.5} />
+          <p className="text-sm text-amber-200">{error}</p>
         </div>
       )}
 
       {/* Skeleton while generating */}
       {generating && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-3">
-          <div className="h-5 bg-gray-100 rounded w-1/3 animate-pulse" />
-          <div className="h-4 bg-gray-100 rounded w-1/4 animate-pulse" />
+        <div className="bg-dark-card border border-dark-border rounded-lg p-6 space-y-3">
+          <div className="h-5 bg-dark-elevated rounded w-1/3 animate-pulse" />
+          <div className="h-4 bg-dark-elevated rounded w-1/4 animate-pulse" />
           <div className="mt-4 space-y-2">
             {Array.from({ length: totalLegs }).map((_, i) => (
-              <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-10 bg-dark-elevated rounded animate-pulse" />
             ))}
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function ScheduleGenerator() {
 
       {/* Draft result */}
       {draft && !generating && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <div className="bg-dark-card border border-dark-border rounded-lg p-6">
           <ScheduleTable schedule={draft as ScheduleData} />
         </div>
       )}

@@ -1,10 +1,9 @@
 import { auth } from '@/auth'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { ArrowLeft, Plane, LogOut } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { signOutAction } from '@/app/actions/auth'
 import ScheduleTable from '@/components/ScheduleTable'
 import DeleteButton from './DeleteButton'
 import airlinesConfig from '@/config/airlines.json'
@@ -36,65 +35,57 @@ export default async function ScheduleDetailPage({
   if (!schedule || schedule.userId !== session.user.id) notFound()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
-        <div className="flex items-center gap-2">
-          <Plane size={18} className="text-brand-500" strokeWidth={1.5} />
-          <span className="text-gray-900 font-bold text-xl">CrewBoard</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">{session.user.email}</span>
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="hover:bg-gray-100 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors duration-100"
-            >
-              <LogOut size={16} strokeWidth={1.5} />
-              Log out
-            </button>
-          </form>
-        </div>
-      </nav>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <Link
+          href="/dashboard/schedules"
+          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#F1F2F4] transition-colors"
+        >
+          <ArrowLeft size={15} strokeWidth={1.5} />
+          Back to schedules
+        </Link>
+        <DeleteButton scheduleId={schedule.id} />
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
-          >
-            <ArrowLeft size={15} strokeWidth={1.5} />
-            Back to dashboard
-          </Link>
-          <DeleteButton scheduleId={schedule.id} />
-        </div>
-
-        {/* Metadata card */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+      {/* Metadata card */}
+      <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="font-mono text-accent-400">{schedule.airline}</span>
+          <h1 className="text-2xl font-semibold text-[#F1F2F4]">
             {getAirlineName(schedule.airline)}
           </h1>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-            <span>
-              Base: <span className="font-mono text-gray-700">{schedule.baseIcao}</span>
-            </span>
-            <span>{getFamilyName(schedule.family)}</span>
-            <span>{schedule.legs} legs</span>
-            <span>Max {schedule.maxLegH}h</span>
-            <span className="capitalize">{schedule.mode}</span>
-            <span>{formatDistanceToNow(schedule.createdAt, { addSuffix: true })}</span>
-          </div>
         </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400 mt-2">
+          <span>
+            Base: <span className="font-mono text-[#F1F2F4]">{schedule.baseIcao}</span>
+          </span>
+          <span>{getFamilyName(schedule.family)}</span>
+          <span>{schedule.legs} legs</span>
+          <span>Max {schedule.maxLegH}h</span>
+          <span>
+            {schedule.mode === 'out-and-back' ? (
+              <span className="text-xs font-medium px-2 py-0.5 rounded border bg-dark-elevated text-blue-400 border-blue-400/20">
+                Out &amp; back
+              </span>
+            ) : (
+              <span className="text-xs font-medium px-2 py-0.5 rounded border bg-dark-elevated text-accent-400 border-accent-400/20">
+                Chain
+              </span>
+            )}
+          </span>
+          <span>{formatDistanceToNow(schedule.createdAt, { addSuffix: true })}</span>
+        </div>
+      </div>
 
-        {/* Schedule table */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-          <ScheduleTable
-            schedule={{
-              ...schedule,
-              createdAt: schedule.createdAt.toISOString(),
-            }}
-          />
-        </div>
-      </main>
+      {/* Schedule table */}
+      <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+        <ScheduleTable
+          schedule={{
+            ...schedule,
+            createdAt: schedule.createdAt.toISOString(),
+          }}
+        />
+      </div>
     </div>
   )
 }
