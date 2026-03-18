@@ -1,13 +1,14 @@
 import { Suspense } from 'react'
 import { auth } from '@/auth'
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
+import { getFlight } from '@/lib/services/schedules'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { buildSimBriefUrl } from '@/lib/simbrief'
 import { fetchMetar, formatObservationTime } from '@/lib/metar'
 import { getAirport } from '@/lib/airports'
 import RouteMap from '@/components/RouteMap'
+import MarkFlownButton from './MarkFlownButton'
 import airlinesConfig from '@/config/airlines.json'
 
 function formatDuration(minutes: number): string {
@@ -92,10 +93,7 @@ export default async function FlightDetailPage({
 
   const { flightId } = await params
 
-  const flight = await prisma.scheduleFlight.findUnique({
-    where: { id: flightId },
-    include: { schedule: true },
-  })
+  const flight = await getFlight(flightId)
 
   if (!flight || flight.schedule.userId !== session.user.id) notFound()
 
@@ -136,15 +134,18 @@ export default async function FlightDetailPage({
             </p>
           </div>
 
-          <a
-            href={simBriefUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2.5 rounded-md transition-colors flex items-center gap-2 shrink-0"
-          >
-            <ExternalLink size={16} />
-            Dispatch in SimBrief
-          </a>
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            <MarkFlownButton flightId={flight.id} initialCompleted={flight.completed} />
+            <a
+              href={simBriefUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-accent-400 hover:bg-accent-500 text-dark-primary font-semibold px-4 py-2.5 rounded-md transition-colors flex items-center gap-2"
+            >
+              <ExternalLink size={16} />
+              Dispatch in SimBrief
+            </a>
+          </div>
         </div>
 
         <div className="mt-5 pt-5 border-t border-dark-border grid grid-cols-2 sm:grid-cols-4 gap-4">

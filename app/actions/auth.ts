@@ -1,7 +1,7 @@
 'use server'
 
 import { signIn, signOut } from '@/auth'
-import { prisma } from '@/lib/prisma'
+import { findUserByEmail, createUser } from '@/lib/services/users'
 import bcrypt from 'bcryptjs'
 import { AuthError } from 'next-auth'
 
@@ -35,13 +35,11 @@ export async function registerAction(
   if (password.length < 8) return 'Password must be at least 8 characters'
 
   try {
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const existing = await findUserByEmail(email)
     if (existing) return 'An account with this email already exists'
 
     const hashedPassword = await bcrypt.hash(password, 12)
-    await prisma.user.create({
-      data: { email, hashedPassword, name: name || null },
-    })
+    await createUser({ email, hashedPassword, name: name || null })
   } catch {
     return 'Could not create account. Please try again.'
   }

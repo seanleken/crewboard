@@ -1,11 +1,12 @@
 import { auth } from '@/auth'
 import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
+import { getSchedule } from '@/lib/services/schedules'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import ScheduleTable from '@/components/ScheduleTable'
 import DeleteButton from './DeleteButton'
+import MarkScheduleCompleteButton from './MarkScheduleCompleteButton'
 import airlinesConfig from '@/config/airlines.json'
 import familiesConfig from '@/config/aircraft-families.json'
 
@@ -27,10 +28,7 @@ export default async function ScheduleDetailPage({
 
   const { id } = await params
 
-  const schedule = await prisma.schedule.findUnique({
-    where: { id },
-    include: { flights: { orderBy: { sequence: 'asc' } } },
-  })
+  const schedule = await getSchedule(id)
 
   if (!schedule || schedule.userId !== session.user.id) notFound()
 
@@ -44,23 +42,33 @@ export default async function ScheduleDetailPage({
           <ArrowLeft size={15} strokeWidth={1.5} />
           Back to schedules
         </Link>
-        <DeleteButton scheduleId={schedule.id} />
+        <div className="flex items-center gap-3">
+          <MarkScheduleCompleteButton scheduleId={schedule.id} initialCompleted={schedule.completed} />
+          <DeleteButton scheduleId={schedule.id} />
+        </div>
       </div>
 
       {/* Metadata card */}
       <div className="bg-dark-card border border-dark-border rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className="font-mono text-accent-400">{schedule.airline}</span>
           <h1 className="text-2xl font-semibold text-[#F1F2F4]">
             {getAirlineName(schedule.airline)}
           </h1>
+          {schedule.completed && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded border bg-green-900/20 text-green-400 border-green-400/20">
+              Completed
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400 mt-2">
           <span>
             Base: <span className="font-mono text-[#F1F2F4]">{schedule.baseIcao}</span>
           </span>
           <span>{getFamilyName(schedule.family)}</span>
-          <span>{schedule.legs} legs</span>
+          <span>
+            {schedule.flights.filter((f) => f.completed).length}/{schedule.legs} flown
+          </span>
           <span>Max {schedule.maxLegH}h</span>
           <span>
             {schedule.mode === 'out-and-back' ? (

@@ -1,8 +1,9 @@
 'use client'
 
 import clsx from 'clsx'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, CheckCircle, Circle } from 'lucide-react'
 import airlinesConfig from '@/config/airlines.json'
 import familiesConfig from '@/config/aircraft-families.json'
 
@@ -17,6 +18,7 @@ export interface ScheduleFlight {
   aircraftIcao: string
   durationMinutes: number
   isGenerated: boolean
+  completed?: boolean
 }
 
 export interface ScheduleData {
@@ -67,6 +69,27 @@ export default function ScheduleTable({ schedule }: { schedule: ScheduleData }) 
   const isOutAndBack = schedule.mode === 'out-and-back'
   const hubs = new Set(getHubs(schedule.airline))
 
+  // Track optimistic completion state
+  const [completedIds, setCompletedIds] = useState<Set<string>>(
+    () => new Set(schedule.flights.filter((f) => f.id && f.completed).map((f) => f.id!))
+  )
+
+  async function markFlightComplete(e: React.MouseEvent, flightId: string) {
+    e.stopPropagation()
+    if (completedIds.has(flightId)) return
+    setCompletedIds((prev) => new Set(prev).add(flightId))
+    try {
+      await fetch(`/api/flights/${flightId}`, { method: 'PATCH' })
+    } catch {
+      // Revert on failure
+      setCompletedIds((prev) => {
+        const next = new Set(prev)
+        next.delete(flightId)
+        return next
+      })
+    }
+  }
+
   return (
     <div>
       {/* Schedule header */}
@@ -112,7 +135,7 @@ export default function ScheduleTable({ schedule }: { schedule: ScheduleData }) 
               <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Block Time
               </th>
-              {/* Chevron column — only rendered for saved schedules */}
+              <th className="w-8" />
               <th className="w-8" />
             </tr>
           </thead>
@@ -120,6 +143,7 @@ export default function ScheduleTable({ schedule }: { schedule: ScheduleData }) 
             {schedule.flights.map((flight) => {
               const isEvenPair = flight.pairIndex % 2 === 0
               const isClickable = !!flight.id
+              const isCompleted = flight.id ? completedIds.has(flight.id) : false
 
               return (
                 <tr
@@ -128,7 +152,8 @@ export default function ScheduleTable({ schedule }: { schedule: ScheduleData }) 
                   className={clsx(
                     'border-b border-dark-border last:border-0 transition-colors',
                     isEvenPair ? 'bg-dark-card' : 'bg-dark-elevated/50',
-                    isClickable && 'cursor-pointer hover:bg-dark-elevated'
+                    isClickable && 'cursor-pointer hover:bg-dark-elevated',
+                    isCompleted && 'opacity-50'
                   )}
                 >
                   <td className="px-4 py-3 text-sm text-gray-500 tabular-nums">
@@ -177,8 +202,26 @@ export default function ScheduleTable({ schedule }: { schedule: ScheduleData }) 
                   <td className="px-4 py-3 text-sm text-gray-400 tabular-nums">
                     {formatDuration(flight.durationMinutes)}
                   </td>
+
+                  {/* Completion toggle */}
+                  <td className="px-2 py-3">
+                    {isClickable && (
+                      isCompleted ? (
+                        <CheckCircle size={16} className="text-green-400" />
+                      ) : (
+                        <button
+                          onClick={(e) => markFlightComplete(e, flight.id!)}
+                          title="Mark as flown"
+                          className="text-gray-600 hover:text-green-400 transition-colors"
+                        >
+                          <Circle size={16} />
+                        </button>
+                      )
+                    )}
+                  </td>
+
                   <td className="pr-3 text-gray-600">
-                    {isClickable && <ChevronRight size={14} />}
+                    {isClickable && !isCompleted && <ChevronRight size={14} />}
                   </td>
                 </tr>
               )

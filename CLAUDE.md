@@ -79,6 +79,17 @@ auth.ts                             # NextAuth config (Credentials provider, JWT
 proxy.ts                            # Route protection — Next.js 16 uses proxy.ts, NOT middleware.ts
 ```
 
+## Service Layer
+
+All database access goes through `lib/services/` — never import `prisma` directly in pages, API routes, or server actions.
+
+| File | Purpose |
+|------|---------|
+| `lib/services/schedules.ts` | Schedule + flight CRUD (`listSchedules`, `getSchedule`, `createSchedule`, `markScheduleComplete`, `deleteSchedule`, `getFlight`, `markFlightComplete`, `getSchedulesWithFlights`) |
+| `lib/services/users.ts` | User lookups + creation (`findUserByEmail`, `createUser`) |
+
+`lib/prisma.ts` and `lib/schedule-generator.ts` may import Prisma directly — they are infrastructure/algorithm libs, not request handlers.
+
 ## Key Architecture Decisions
 
 ### Draft / Save Flow

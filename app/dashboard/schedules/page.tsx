@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
+import { listSchedules } from '@/lib/services/schedules'
 import { formatDistanceToNow } from 'date-fns'
 import { Plane } from 'lucide-react'
 import Link from 'next/link'
@@ -19,19 +19,7 @@ export default async function SchedulesPage() {
   const session = await auth()
   if (!session) redirect('/login')
 
-  const schedules = await prisma.schedule.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      airline: true,
-      family: true,
-      baseIcao: true,
-      mode: true,
-      legs: true,
-      createdAt: true,
-    },
-  })
+  const schedules = await listSchedules(session.user.id)
 
   return (
     <div className="space-y-6">
@@ -70,7 +58,12 @@ export default async function SchedulesPage() {
                     {formatDistanceToNow(new Date(schedule.createdAt), { addSuffix: true })}
                   </p>
                 </div>
-                <div className="ml-4 shrink-0">
+                <div className="ml-4 shrink-0 flex items-center gap-2">
+                  {schedule.completed && (
+                    <span className="text-xs font-medium px-2 py-1 rounded border bg-green-900/20 text-green-400 border-green-400/20">
+                      Completed
+                    </span>
+                  )}
                   {schedule.mode === 'out-and-back' ? (
                     <span className="text-xs font-medium px-2 py-1 rounded border bg-dark-elevated text-blue-400 border-blue-400/20">
                       Out &amp; back

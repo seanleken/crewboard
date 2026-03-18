@@ -43,6 +43,7 @@ model Schedule {
   mode      String           @default("chain")
   maxLegH   Int
   legs      Int
+  completed Boolean          @default(false)
   createdAt DateTime         @default(now())
   flights   ScheduleFlight[]
 }
@@ -60,6 +61,7 @@ model ScheduleFlight {
   aircraftIcao    String
   durationMinutes Int
   isGenerated     Boolean  @default(false)
+  completed       Boolean  @default(false)
 
   @@index([scheduleId])
 }
