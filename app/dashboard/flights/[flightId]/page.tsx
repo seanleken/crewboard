@@ -108,7 +108,7 @@ export default async function FlightDetailPage({
     <div className="space-y-6">
       {/* Back link */}
       <Link
-        href={`/dashboard/schedules/${schedule.id}`}
+        href="/dashboard/schedule"
         className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#F1F2F4] transition-colors"
       >
         <ArrowLeft size={15} strokeWidth={1.5} />

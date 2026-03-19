@@ -36,30 +36,49 @@ export function getSchedule(id: string) {
   })
 }
 
+const scheduleCreateData = (userId: string, draft: GeneratedSchedule) => ({
+  userId,
+  airline: draft.airline,
+  family: draft.family,
+  baseIcao: draft.baseIcao,
+  mode: draft.mode,
+  maxLegH: draft.maxLegH,
+  legs: draft.legs,
+  flights: {
+    create: draft.flights.map((f) => ({
+      sequence: f.sequence,
+      pairIndex: f.pairIndex,
+      direction: f.direction,
+      flightNumber: f.flightNumber,
+      originIcao: f.originIcao,
+      destinationIcao: f.destinationIcao,
+      aircraftIcao: f.aircraftIcao,
+      durationMinutes: f.durationMinutes,
+      isGenerated: f.isGenerated,
+    })),
+  },
+})
+
 export function createSchedule(userId: string, draft: GeneratedSchedule) {
   return prisma.schedule.create({
-    data: {
-      userId,
-      airline: draft.airline,
-      family: draft.family,
-      baseIcao: draft.baseIcao,
-      mode: draft.mode,
-      maxLegH: draft.maxLegH,
-      legs: draft.legs,
-      flights: {
-        create: draft.flights.map((f) => ({
-          sequence: f.sequence,
-          pairIndex: f.pairIndex,
-          direction: f.direction,
-          flightNumber: f.flightNumber,
-          originIcao: f.originIcao,
-          destinationIcao: f.destinationIcao,
-          aircraftIcao: f.aircraftIcao,
-          durationMinutes: f.durationMinutes,
-          isGenerated: f.isGenerated,
-        })),
-      },
-    },
+    data: scheduleCreateData(userId, draft),
+    include: { flights: { orderBy: { sequence: 'asc' } } },
+  })
+}
+
+export function replaceSchedule(userId: string, draft: GeneratedSchedule) {
+  return prisma.$transaction(async (tx) => {
+    await tx.schedule.deleteMany({ where: { userId } })
+    return tx.schedule.create({
+      data: scheduleCreateData(userId, draft),
+      include: { flights: { orderBy: { sequence: 'asc' } } },
+    })
+  })
+}
+
+export function getActiveSchedule(userId: string) {
+  return prisma.schedule.findFirst({
+    where: { userId },
     include: { flights: { orderBy: { sequence: 'asc' } } },
   })
 }

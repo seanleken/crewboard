@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import type { GeneratedSchedule } from '@/lib/schedule-generator'
-import { getSchedulesWithFlights, createSchedule } from '@/lib/services/schedules'
+import { getSchedulesWithFlights, replaceSchedule } from '@/lib/services/schedules'
 
 export async function GET() {
   const session = await auth()
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const schedule = await createSchedule(session.user.id, draft)
+    const schedule = await replaceSchedule(session.user.id, draft)
     return NextResponse.json({ schedule }, { status: 201 })
   } catch {
     return NextResponse.json({ error: 'Failed to save schedule' }, { status: 500 })

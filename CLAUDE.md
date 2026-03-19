@@ -36,24 +36,27 @@ app/
   dashboard/
     layout.tsx                      # Shared sidebar layout for all authenticated pages
     error.tsx                       # Dashboard-scoped error boundary
-    page.tsx                        # Schedule generator only (no past schedules list)
-    ScheduleGenerator.tsx           # Client — form, draft/save state
-    schedules/
-      page.tsx                      # Saved schedules list (dedicated page)
-      [id]/
-        page.tsx                    # Schedule detail view
-        DeleteButton.tsx            # Client — inline delete confirmation
+    page.tsx                        # Pilot home screen — next flight + schedule progress
+    ScheduleGenerator.tsx           # Client — form, draft/save state, replace confirmation
+    generate/
+      page.tsx                      # Schedule generator page
+    schedule/
+      page.tsx                      # Active schedule detail (single schedule per user)
+      MarkScheduleCompleteButton.tsx # Client — inline complete confirmation
     flights/
       [flightId]/
         page.tsx                    # Flight detail — SimBrief dispatch + METAR + route map
+        MarkFlownButton.tsx         # Client — inline mark flown confirmation
     settings/
       page.tsx                      # Settings placeholder (email display)
   api/
     auth/[...nextauth]/route.ts
     schedules/
       generate/route.ts             # POST — runs algorithm, returns draft (no DB write)
-      route.ts                      # GET list, POST save
-      [id]/route.ts                 # GET single, DELETE
+      route.ts                      # GET list, POST save (replaces existing schedule atomically)
+      [id]/route.ts                 # GET single, PATCH complete, DELETE
+    flights/
+      [flightId]/route.ts           # PATCH — mark flight complete
 
 components/
   Sidebar.tsx                       # Fixed sidebar nav (desktop) + slide-over (mobile)
@@ -97,7 +100,7 @@ Generate and save are **two separate steps** by design:
 - `POST /api/schedules/generate` — runs the algorithm, returns the result, **no DB write**
 - `POST /api/schedules` — persists the draft to the database
 
-The `ScheduleGenerator` component holds the draft in local state. After a successful save it calls `router.refresh()`. Past schedules live at `/dashboard/schedules`, not on the dashboard page.
+The `ScheduleGenerator` component holds the draft in local state. After a successful save it redirects to `/dashboard`. Only one schedule per user exists at a time — saving a new schedule atomically deletes the existing one (`replaceSchedule` uses a Prisma transaction). If an active schedule exists, a warning banner and inline replace confirmation are shown before saving.
 
 ### Schedule Generation — Two Modes
 Detected automatically from hub count in `config/airlines.json`:

@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Plane, LayoutDashboard, ClipboardList, Settings, LogOut, Menu, X } from 'lucide-react'
+import { Plane, LayoutDashboard, Wand2, ClipboardList, Settings, LogOut, Menu, X } from 'lucide-react'
 import { signOutAction } from '@/app/actions/auth'
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Schedules', icon: ClipboardList, href: '/dashboard/schedules' },
+  { label: 'Generate', icon: Wand2, href: '/dashboard/generate' },
+  { label: 'Active Schedule', icon: ClipboardList, href: '/dashboard/schedule' },
   { label: 'Settings', icon: Settings, href: '/dashboard/settings' },
 ]
 

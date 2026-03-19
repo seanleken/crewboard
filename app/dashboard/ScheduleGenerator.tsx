@@ -15,7 +15,13 @@ const inputClass =
   'w-full bg-dark-elevated border border-dark-border focus:border-accent-400 focus:ring-2 focus:ring-accent-400/20 text-[#F1F2F4] px-3 py-2.5 rounded-md text-base transition-colors outline-none'
 const labelClass = 'block text-sm font-medium text-gray-400 mb-1.5'
 
-export default function ScheduleGenerator() {
+interface ActiveScheduleInfo {
+  airline: string
+  completedLegs: number
+  totalLegs: number
+}
+
+export default function ScheduleGenerator({ activeInfo }: { activeInfo?: ActiveScheduleInfo | null }) {
   const router = useRouter()
   const [airlineIcao, setAirlineIcao] = useState(airlinesData.airlines[0].icao)
   const [familyId, setFamilyId] = useState(familiesData.families[0].id)
@@ -27,7 +33,10 @@ export default function ScheduleGenerator() {
   const [savedId, setSavedId] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [confirmingReplace, setConfirmingReplace] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const airlineName = airlinesData.airlines.find((a) => a.icao === activeInfo?.airline)?.name ?? activeInfo?.airline
 
   async function generate() {
     setGenerating(true)
@@ -61,6 +70,12 @@ export default function ScheduleGenerator() {
 
   async function save() {
     if (!draft) return
+
+    if (activeInfo && !confirmingReplace) {
+      setConfirmingReplace(true)
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -73,12 +88,14 @@ export default function ScheduleGenerator() {
       const data = await res.json()
       if (!res.ok) {
         setError(data.error ?? 'Failed to save schedule')
+        setConfirmingReplace(false)
         return
       }
       setSavedId(data.schedule.id)
-      router.refresh()
+      router.push('/dashboard')
     } catch {
       setError('Failed to connect to the server')
+      setConfirmingReplace(false)
     } finally {
       setSaving(false)
     }
@@ -89,6 +106,17 @@ export default function ScheduleGenerator() {
 
   return (
     <div className="space-y-6">
+      {/* Active schedule warning banner */}
+      {activeInfo && activeInfo.completedLegs < activeInfo.totalLegs && (
+        <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" strokeWidth={1.5} />
+          <p className="text-sm text-amber-200">
+            You have an active schedule ({airlineName} · {activeInfo.completedLegs} of {activeInfo.totalLegs} legs completed).
+            Saving a new schedule will replace it and all progress will be lost.
+          </p>
+        </div>
+      )}
+
       {/* Generator form */}
       <div className="bg-dark-card border border-dark-border rounded-lg p-6">
         <h2 className="text-xl font-semibold text-[#F1F2F4] mb-5">Generate Schedule</h2>
@@ -193,7 +221,7 @@ export default function ScheduleGenerator() {
             </button>
           )}
 
-          {draft && !generating && !isSaved && (
+          {draft && !generating && !isSaved && !confirmingReplace && (
             <button
               onClick={save}
               disabled={isLoading}
@@ -211,6 +239,26 @@ export default function ScheduleGenerator() {
                 </>
               )}
             </button>
+          )}
+
+          {draft && !generating && !isSaved && confirmingReplace && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-gray-400">This will delete your current schedule and all flight progress.</span>
+              <button
+                onClick={() => setConfirmingReplace(false)}
+                className="text-sm text-gray-400 hover:text-[#F1F2F4] px-3 py-1.5 rounded hover:bg-dark-elevated transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={save}
+                disabled={saving}
+                className="text-sm text-amber-300 hover:text-amber-200 font-medium px-3 py-1.5 rounded border border-amber-400/20 hover:border-amber-400/30 hover:bg-amber-900/20 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {saving && <Loader2 size={13} className="animate-spin" />}
+                Replace schedule
+              </button>
+            </div>
           )}
 
           {isSaved && (
