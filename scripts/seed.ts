@@ -95,6 +95,7 @@ async function fetchPage(path: string): Promise<AeroResponse> {
     }
 
     if (!res.ok) {
+      console.error(`error - {${JSON.stringify(res)}}`)
       const body = await res.text()
       throw new Error(`AeroAPI ${res.status}: ${body}`)
     }
@@ -225,10 +226,6 @@ async function seedAirline(
     prisma.route.createMany({ data: Array.from(routes.values()) }),
   ])
 
-  fs.writeFileSync(
-    `./tmp/${airlineIcao}_routes.json`,
-    JSON.stringify(Array.from(routes.values()), null, 2)
-  )
   console.log(`   ✓ Done`)
 }
 
