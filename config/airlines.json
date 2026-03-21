@@ -23,7 +23,7 @@
     {
       "icao": "AAL",
       "name": "American Airlines",
-      "hubs": ["KJFK", "KLAX", "KPHL", "KDFW", "KMIA", "KCLT", "KDCA"]
+      "hubs": ["KJFK", "KLAX", "KPHL", "KDFW", "KMIA", "KCLT", "KPHX", "KORD"]
     },
     {
       "icao": "UAL",
