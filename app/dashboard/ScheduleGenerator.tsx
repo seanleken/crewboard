@@ -129,7 +129,7 @@ export default function ScheduleGenerator({ activeInfo }: { activeInfo?: ActiveS
               onChange={(e) => setAirlineIcao(e.target.value)}
               className={inputClass}
             >
-              {airlinesData.airlines.map((a) => (
+              {[...airlinesData.airlines].sort((a, b) => a.name.localeCompare(b.name)).map((a) => (
                 <option key={a.icao} value={a.icao}>
                   {a.name}
                 </option>
