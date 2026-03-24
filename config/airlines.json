@@ -189,6 +189,16 @@
       "icao": "AMX",
       "name": "Aeroméxico",
       "hubs": ["MMMX"]
+    },
+    {
+      "icao": "THY",
+      "name": "Turkish Airlines",
+      "hubs": ["LTFM"]
+    },
+    {
+      "icao": "SWA",
+      "name": "Southwest Airlines",
+      "hubs": ["KATL", "KAUS", "KBWI", "KMDW", "KDAL", "KDEN", "KHOU", "KLAS", "KLAX", "KBNA", "KOAK", "KMCO", "KPHX"]
     }
   ]
 }
