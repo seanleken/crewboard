@@ -2,18 +2,6 @@ import { Plane, SlidersHorizontal, Route } from 'lucide-react'
 import Link from 'next/link'
 import { auth } from '@/auth'
 
-const airlines = [
-  { icao: 'DLH', name: 'Lufthansa' },
-  { icao: 'AFR', name: 'Air France' },
-  { icao: 'BEL', name: 'Brussels Airlines' },
-  { icao: 'BAW', name: 'British Airways' },
-  { icao: 'AAL', name: 'American Airlines' },
-  { icao: 'UAL', name: 'United Airlines' },
-  { icao: 'DAL', name: 'Delta Air Lines' },
-  { icao: 'FFT', name: 'Frontier Airlines' },
-  { icao: 'EZY', name: 'easyJet' },
-  { icao: 'RYR', name: 'Ryanair' },
-]
 
 export default async function Home() {
   const session = await auth()
@@ -144,19 +132,9 @@ export default async function Home() {
         </section>
 
         {/* Supported airlines */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
-          <h2 className="text-center text-xl font-semibold text-[#F1F2F4] mb-8">Supported airlines</h2>
-          <div className="flex flex-wrap justify-center gap-2">
-            {airlines.map((a) => (
-              <span
-                key={a.icao}
-                className="bg-dark-elevated text-gray-400 font-mono text-sm px-3 py-1.5 rounded-md border border-dark-border"
-              >
-                <span className="text-accent-400 mr-1.5">{a.icao}</span>
-                {a.name}
-              </span>
-            ))}
-          </div>
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 text-center">
+          <h2 className="text-xl font-semibold text-[#F1F2F4] mb-3">Supported airlines</h2>
+          <p className="text-gray-400">30+ airlines across Europe, North America, Asia-Pacific, the Middle East, Africa, and Latin America.</p>
         </section>
       </main>
 
