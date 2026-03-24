@@ -14,6 +14,11 @@
       "id": "b777",
       "name": "777 Family",
       "icao_codes": ["B77L", "B772", "B773", "B77W"]
+    },
+    {
+      "id": "b737",
+      "name": "737 Family",
+      "icao_codes": ["B737", "B738", "B739", "B38M", "B39M"]
     }
   ]
 }

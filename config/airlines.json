@@ -51,7 +51,144 @@
     {
       "icao": "RYR",
       "name": "Ryanair",
-      "hubs": ["EGCC", "EPKK", "LIRF", "LIPZ"]
+      "hubs": [
+        "GMAD", "LEAL", "LGAV", "LEBL", "LIBD", "LFOB", "EGAA", "LIME",
+        "EDDB", "EGBB", "LIPE", "EGHH", "LZIB", "LIBR", "EGGD", "LROP",
+        "LHBP", "LIEE", "LICC", "LGSA", "EBCI", "EDDK", "EKCH", "LGKR",
+        "EICK", "EIDW", "LDDU", "EGNX", "EGPH", "LPFR", "GMFF", "EPGD",
+        "LEGE", "EGPK", "ESGG", "EDFH", "LEIB", "EDSB", "EPKT", "EYKA",
+        "EPKK", "LICA", "EGNM", "LPPT", "EGGP", "EGGW", "EGSS", "LEMD",
+        "LEMG", "LMML", "EGCC", "GMMX", "LFML", "EDJA", "LIMC", "LIRN",
+        "EGNT", "EDDN", "LICJ", "LEPA", "LCPH", "LIRP", "LIBP", "LPPD",
+        "EPPO", "LKPR", "LPPR", "GMME", "LICR", "LGRP", "EVRA", "LIRA",
+        "LIRF", "EINN", "LEZL", "LEST", "LBSF", "ESSA", "GMTT", "GCTS",
+        "LGTS", "LATI", "LFBO", "LICT", "LIPH", "LIPQ", "LIMF", "LEVC",
+        "LOWW", "LIPZ", "EYVI", "EPMO", "EPWR", "EDLV", "LDZD", "LDZA"
+      ]
+    },
+    {
+      "icao": "WZZ",
+      "name": "Wizz Air",
+      "hubs": [
+        "LYBE", "LZIB", "LRBS", "LROP", "LHBP", "EPGD", "EPKT", "EPKK", "UGKO", "LCLK", "EGKK",
+        "EGGW", "LIMC", "LYPG", "LIRF", "LWSK", "LBSF", "LATI", "LQTZ", "LBWN", "EYVI", "EPWA",
+        "EPWR", "UDYZ"
+      ]
+    },
+    {
+      "icao": "NKS",
+      "name": "Spirit Airlines",
+      "hubs": ["KATL", "KORD", "KDFW", "KDTW", "KFLL", "KIAH", "KLAS", "KMIA", "KEWR", "KMCO"]
+    },
+    {
+      "icao": "AUA",
+      "name": "Austrian Airlines",
+      "hubs": ["LOWW"]
+    },
+    {
+      "icao": "SAS",
+      "name": "Scandinavian Airlines",
+      "hubs": ["ESSA", "EKCH", "ENBR"]
+    },
+    {
+      "icao": "SWR",
+      "name": "Swiss International Air Lines",
+      "hubs": ["LSZH"]
+    },
+    {
+      "icao": "TAP",
+      "name": "TAP Air Portugal",
+      "hubs": ["LPPT"]
+    },
+    {
+      "icao": "VLG",
+      "name": "Vueling Airlines",
+      "hubs": ["LEAL", "EHAM", "LEBL", "LEBB", "LIRQ", "GCLP", "LEIB", "EGKK", "LEMG", "LEPA", "LFPO", "LIRF", "LEST", "LEZL", "GCXO", "LEVC"]
+    },
+    {
+      "icao": "IBE",
+      "name": "Iberia",
+      "hubs": ["LEMD"]
+    },
+    {
+      "icao": "KLM",
+      "name": "KLM Royal Dutch Airlines",
+      "hubs": ["EHAM"]
+    },
+    {
+      "icao": "AIC",
+      "name": "Air India",
+      "hubs": ["VIDP", "VABB"]
+    },
+    {
+      "icao": "APJ",
+      "name": "Peach Aviation",
+      "hubs": ["RJTT", "ROAH", "RJSS", "RJBB"]
+    },
+    {
+      "icao": "QTR",
+      "name": "Qatar Airways",
+      "hubs": ["OTHH"]
+    },
+    {
+      "icao": "UAE",
+      "name": "Emirates",
+      "hubs": ["OMDB"]
+    },
+    {
+      "icao": "JST",
+      "name": "Jetstar",
+      "hubs": ["YPAD", "NZAA", "YBBN", "YBCS", "NZCH", "WADD", "YBCG", "YMML", "YPPH", "YSSY"]
+    },
+    {
+      "icao": "ETH",
+      "name": "Ethiopian Airlines",
+      "hubs": ["HAAB"]
+    },
+    {
+      "icao": "KQA",
+      "name": "Kenya Airways",
+      "hubs": ["HKJK"]
+    },
+    {
+      "icao": "LAN",
+      "name": "LATAM Airlines",
+      "hubs": ["SCEL"]
+    },
+    {
+      "icao": "TAM",
+      "name": "LATAM Airlines Brasil",
+      "hubs": ["SBGR", "SBGL", "SBBR", "SBSP"]
+    },
+    {
+      "icao": "ACA",
+      "name": "Air Canada",
+      "hubs": ["CYYZ", "CYVR", "CYUL"]
+    },
+    {
+      "icao": "QFA",
+      "name": "Qantas Airways",
+      "hubs": ["YSSY", "YMML", "YPPH", "YBBN"]
+    },
+    {
+      "icao": "SIA",
+      "name": "Singapore Airlines",
+      "hubs": ["WSSS"]
+    },
+    {
+      "icao": "KZR",
+      "name": "Air Astana",
+      "hubs": ["UAAA", "UACC"]
+    },
+    {
+      "icao": "AVA",
+      "name": "Avianca",
+      "hubs": ["SKBO"]
+    },
+    {
+      "icao": "AMX",
+      "name": "Aeroméxico",
+      "hubs": ["MMMX"]
     }
   ]
 }

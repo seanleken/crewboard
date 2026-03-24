@@ -100,7 +100,7 @@ export default async function Home() {
           <h2 className="text-center text-xl font-semibold text-[#F1F2F4] mb-8">How it works</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { step: '01', icon: Plane, title: 'Choose your airline', desc: 'Select from 10 real-world airlines with cached route data.' },
+              { step: '01', icon: Plane, title: 'Choose your airline', desc: 'Select from 30+ real-world airlines with cached route data.' },
               { step: '02', icon: SlidersHorizontal, title: 'Set your preferences', desc: 'Pick your aircraft family, max leg duration, and number of legs.' },
               { step: '03', icon: Route, title: 'Fly your schedule', desc: 'Get a realistic, operationally consistent schedule ready to fly.' },
             ].map(({ step, icon: Icon, title, desc }) => (
