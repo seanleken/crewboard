@@ -88,7 +88,7 @@
     {
       "icao": "SAS",
       "name": "Scandinavian Airlines",
-      "hubs": ["ESSA", "EKCH", "ENBR"]
+      "hubs": ["ESSA", "EKCH", "ENGM"]
     },
     {
       "icao": "SWR",
@@ -123,7 +123,7 @@
     {
       "icao": "APJ",
       "name": "Peach Aviation",
-      "hubs": ["RJTT", "ROAH", "RJSS", "RJBB"]
+      "hubs": ["RJAA", "ROAH", "RJSS", "RJBB"]
     },
     {
       "icao": "QTR",
